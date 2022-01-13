@@ -7,7 +7,7 @@ class Tile(pygame.sprite.Sprite):
     def __init__(self, app, tile_type, pos_x, pos_y):
         super().__init__(app.tiles_group, app.all_sprites)
         if tile_type == 'empty':
-            self.image = app.load_image('grass.png')
+            self.image = app.load_image('fon_v_igre.png')
 
         self.rect = self.image.get_rect().move(
             app.tile_width * pos_x, app.tile_height * pos_y)
@@ -27,21 +27,6 @@ class Player(pygame.sprite.Sprite):
             self.kill()
 
 
-class Hero(pygame.sprite.Sprite):
-    def __init__(self, app, pos):
-        super().__init__(app.all_sprites)
-        self.image = app.load_image("mar.png")
-        self.rect = self.image.get_rect()
-        # вычисляем маску для эффективного сравнения
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-
-    def update(self, x, y):
-        self.rect.x += x
-        self.rect.y += y
-
-
 class App:
     def __init__(self):
         pygame.init()
@@ -49,7 +34,7 @@ class App:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('Mario')
-        self.fps = 150
+        self.fps = 0
         pygame.key.set_repeat(200, 70)
         self.all_sprites = pygame.sprite.Group()
         self.tiles_group = pygame.sprite.Group()
@@ -85,16 +70,18 @@ class App:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.terminate()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.pause_screen()
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
-                    if key[pygame.K_DOWN]:
-                        self.player.update(0, 15)
-                    if key[pygame.K_LEFT]:
-                        self.player.update(-15, 0)
-                    if key[pygame.K_RIGHT]:
-                        self.player.update(15, 0)
-                    if key[pygame.K_UP]:
-                        self.player.update(0, -15)
+                    if key[pygame.K_DOWN] or key[pygame.K_s]:
+                        self.player.update(0, 5)
+                    if key[pygame.K_LEFT] or key[pygame.K_a]:
+                        self.player.update(-5, 0)
+                    if key[pygame.K_RIGHT] or key[pygame.K_d]:
+                        self.player.update(5, 0)
+                    if key[pygame.K_UP] or key[pygame.K_w]:
+                        self.player.update(0, -5)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
                     self.game_over += 1
                 if self.game_over == 5:
@@ -122,7 +109,7 @@ class App:
             font = pygame.font.Font(None, 30)
             text_coord = 50
             for line in intro_text:
-                string_rendered = font.render(line, 1, pygame.Color('white'))
+                string_rendered = font.render(line, 1, pygame.Color('yellow'))
                 intro_rect = string_rendered.get_rect()
                 text_coord += 10
                 intro_rect.top = text_coord
@@ -136,7 +123,40 @@ class App:
                         self.terminate()
                     elif event.type == pygame.KEYDOWN or \
                             event.type == pygame.MOUSEBUTTONDOWN:
-                        return  # начинаем игру
+                        self.run_game()  # начинаем игру
+                pygame.display.flip()
+                self.clock.tick(self.fps)
+
+    def pause_screen(self):
+            intro_text = ["ПАУЗА", "", "", "",
+                          "", "",
+                          "", "", "", "", "", "", "",
+                          "НАЖМИТЕ Esc ЧТОБЫ ПРОДОЛЖИТЬ",
+                          "НАЖМИТЕ Backspace ЧТОБЫ ВЫЙТИ"]
+
+            fon = pygame.transform.scale(self.load_image('fon.jpg'), (self.width, self.height))
+            self.screen.blit(fon, (0, 0))
+            font = pygame.font.Font(None, 30)
+            text_coord = 50
+            for line in intro_text:
+                string_rendered = font.render(line, 1, pygame.Color('yellow'))
+                intro_rect = string_rendered.get_rect()
+                text_coord += 10
+                intro_rect.top = text_coord
+                intro_rect.x = 10
+                text_coord += intro_rect.height
+                self.screen.blit(string_rendered, intro_rect)
+
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.terminate()
+                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        self.run_game()  # начинаем игру
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
+                        self.player.update(0, 0)
+                        self.player, self.level_x, self.level_y = self.generate_level(self.load_level('level_1.txt'))
+                        self.start_screen()
                 pygame.display.flip()
                 self.clock.tick(self.fps)
 
@@ -152,7 +172,7 @@ class App:
             font = pygame.font.Font(None, 30)
             text_coord = 50
             for line in intro_text:
-                string_rendered = font.render(line, 1, pygame.Color('white'))
+                string_rendered = font.render(line, 1, pygame.Color('yellow'))
                 intro_rect = string_rendered.get_rect()
                 text_coord += 10
                 intro_rect.top = text_coord
