@@ -7,7 +7,7 @@ class Tile(pygame.sprite.Sprite):
     def __init__(self, app, tile_type, pos_x, pos_y):
         super().__init__(app.tiles_group, app.all_sprites)
         if tile_type == 'empty':
-            self.image = app.load_image('grass.png')
+            self.image = app.load_image('fon_v_igre.png')
 
         self.rect = self.image.get_rect().move(
             app.tile_width * pos_x, app.tile_height * pos_y)
@@ -25,21 +25,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += y
         if x == 0 and y == 0:
             self.kill()
-
-
-class Hero(pygame.sprite.Sprite):
-    def __init__(self, app, pos):
-        super().__init__(app.all_sprites)
-        self.image = app.load_image("mar.png")
-        self.rect = self.image.get_rect()
-        # вычисляем маску для эффективного сравнения
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-
-    def update(self, x, y):
-        self.rect.x += x
-        self.rect.y += y
 
 
 class App:
@@ -90,13 +75,13 @@ class App:
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
                     if key[pygame.K_DOWN]:
-                        self.player.update(0, 15)
+                        self.player.update(0, 5)
                     if key[pygame.K_LEFT]:
-                        self.player.update(-15, 0)
+                        self.player.update(-5, 0)
                     if key[pygame.K_RIGHT]:
-                        self.player.update(15, 0)
+                        self.player.update(5, 0)
                     if key[pygame.K_UP]:
-                        self.player.update(0, -15)
+                        self.player.update(0, -5)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
                     self.game_over += 1
                 if self.game_over == 5:
@@ -124,7 +109,7 @@ class App:
             font = pygame.font.Font(None, 30)
             text_coord = 50
             for line in intro_text:
-                string_rendered = font.render(line, 1, pygame.Color('white'))
+                string_rendered = font.render(line, 1, pygame.Color('yellow'))
                 intro_rect = string_rendered.get_rect()
                 text_coord += 10
                 intro_rect.top = text_coord
@@ -155,7 +140,7 @@ class App:
             font = pygame.font.Font(None, 30)
             text_coord = 50
             for line in intro_text:
-                string_rendered = font.render(line, 1, pygame.Color('white'))
+                string_rendered = font.render(line, 1, pygame.Color('yellow'))
                 intro_rect = string_rendered.get_rect()
                 text_coord += 10
                 intro_rect.top = text_coord
@@ -188,7 +173,7 @@ class App:
             font = pygame.font.Font(None, 30)
             text_coord = 50
             for line in intro_text:
-                string_rendered = font.render(line, 1, pygame.Color('white'))
+                string_rendered = font.render(line, 1, pygame.Color('yellow'))
                 intro_rect = string_rendered.get_rect()
                 text_coord += 10
                 intro_rect.top = text_coord
