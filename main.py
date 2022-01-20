@@ -13,6 +13,29 @@ class Tile(pygame.sprite.Sprite):
             app.tile_width * pos_x, app.tile_height * pos_y)
 
 
+class AnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, app, sheet, columns, rows, x, y):
+        super().__init__(app.all_sprites)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, app, pos_x, pos_y):
         super().__init__(app.player_group, app.all_sprites)
@@ -34,8 +57,9 @@ class App:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('Mario')
-        self.fps = 150
+        self.fps = 15
         pygame.key.set_repeat(200, 70)
+        self.restart = AnimatedSprite(self, self.load_image("restart.png"), 8, 2, 138, 133)
         self.all_sprites = pygame.sprite.Group()
         self.tiles_group = pygame.sprite.Group()
         self.player_group = pygame.sprite.Group()
@@ -164,8 +188,8 @@ class App:
     def end_screen(self):
             intro_text = ["ЗАСТАВКА", "", "", "",
                           "ВАШ СЧЁТ", "",
-                          "ЛУЧШИЙ СЧЁТ", "", "", "", "", "", "",
-                          "НАЖМИТЕ Esc ЧТОБЫ ВЫЙТИ",
+                          "ЛУЧШИЙ СЧЁТ", "", "", "",
+                          "НАЖМИТЕ Esc ЧТОБЫ ВЫЙТИ", "",
                           "НАЖМИТЕ ЧТОБЫ НАЧАТЬ СНАЧАЛА"]
 
             fon = pygame.transform.scale(self.load_image('fon.jpg'), (self.width, self.height))
@@ -191,6 +215,8 @@ class App:
                         self.run_game()  # начинаем игру
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         self.start_screen()
+                self.restart.draw(self.screen)
+                self.restart.update()
                 pygame.display.flip()
                 self.clock.tick(self.fps)
 
