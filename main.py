@@ -197,12 +197,11 @@ class App:
 
     def pause_screen(self):
         intro_text = ["ПАУЗА", "", "", "",
-                      "", "",
                       "", "", "", "", "", "", "",
                       "НАЖМИТЕ Esc ЧТОБЫ ПРОДОЛЖИТЬ",
                       "НАЖМИТЕ Backspace ЧТОБЫ ВЫЙТИ"]
 
-        fon = pygame.transform.scale(self.load_image('fon.jpg'), (self.width, self.height))
+        fon = pygame.transform.scale(self.load_image('fon.png'), (self.width, self.height))
         self.screen.blit(fon, (0, 0))
         font = pygame.font.Font(None, 30)
         text_coord = 50
